@@ -5,7 +5,7 @@ package geo;
 option csharp_namespace = "Clients.Geo";
 option java_package = "clients.geo";
 option java_outer_classname = "GeoProto";
-option go_package = "geosrv/geopb";
+option go_package = "clients/geopb";
 
 // Geo service definition
 service Geo {
