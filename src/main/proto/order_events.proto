@@ -13,7 +13,10 @@ message OrderCreatedIntegrationEvent {
   string order_id = 1;
 }
 
+message OrderAssignedIntegrationEvent {
+  string order_id = 1;
+}
+
 message OrderCompletedIntegrationEvent {
   string order_id = 1;
-  string courier_id = 2;
 }
