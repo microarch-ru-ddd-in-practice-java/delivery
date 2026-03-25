@@ -11,16 +11,18 @@
 
 # Запросы к БД
 ```
+SELECT * public.assignments;
 SELECT * FROM public.couriers;
-SELECT * public.storage_places;
 SELECT * FROM public.orders;
 SELECT * public.outbox;
 ```
 
 # Очистка БД (все кроме справочников)
 ```
+DELETE FROM public.assignments;
+DELETE FROM public.couriers;
 DELETE FROM public.orders;
-DELETE FROM public.items;
+
 DELETE FROM public.outbox;
 ```
 
