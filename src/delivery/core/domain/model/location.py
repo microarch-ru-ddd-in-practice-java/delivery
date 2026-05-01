@@ -1,34 +1,22 @@
+from dataclasses import dataclass
 from typing import Self
 
+@dataclass(
+    frozen=True,
+    slots=True
+)
 class Location:
-    def __init__(
-        self,
-        x: int,
-        y: int,
-    ):
-        self._x = self._validate_coordinate(x)
-        self._y = self._validate_coordinate(y)
+    x: int
+    y: int
 
-    @property
-    def x(self) -> int:
-        return self._x
-
-    @property
-    def y(self) -> int:
-        return self._y
+    def __post_init__(self) -> None:
+        for name, value in (("x", self.x), ("y", self.y)):
+            self._validate_coordinate(name, value)
 
     @staticmethod
-    def _validate_coordinate(coordinate: int) -> int:
-        if not (1 <= coordinate <= 10):
-            raise ValueError("Coordinate should be in between 0 and 10!")
-
-        return coordinate
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, Location):
-            return False
-
-        return self.x == other.x and self.y == other.y
+    def _validate_coordinate(coordinate_name: str, coordinate_value: int) -> None:
+        if not (1 <= coordinate_value <= 10):
+            raise ValueError(f"{coordinate_name} must be between 1 and 10, got {coordinate_value}")
 
     def distance_to(self, other: Self) -> int:
         return abs(self.x - other.x) + abs(self.y - other.y)
