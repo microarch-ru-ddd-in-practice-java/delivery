@@ -1,4 +1,27 @@
-# === Java и Backend ===
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+.venv-packages/
+uv.lock
+venv/
+ENV/
+env/
+*.egg-info/
+.eggs/
+dist/
+*.egg
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# === Java и Backend (legacy) ===
 *.class
 *.jar
 *.war

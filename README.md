@@ -1,5 +1,5 @@
-# Демо проект к курсу "Domain Driven Design и Clean Architecture на языке Java"
-📚 Подробнее о курсе: [microarch.ru/courses/ddd/languages/java](https://microarch.ru/courses/ddd/languages/java?utm_source=gitlab&utm_medium=repository)
+# Демо проект к курсу "Domain Driven Design и Clean Architecture на языке Python"
+📚 Подробнее о курсе: [microarch.ru/courses/ddd/languages/python](https://microarch.ru/courses/ddd/languages/python?utm_source=gitlab&utm_medium=repository)
 
 ---
 
@@ -9,35 +9,77 @@
 
 ---
 
-# Запросы к БД
-```
-SELECT * public.assignments;
-SELECT * FROM public.couriers;
-SELECT * FROM public.orders;
-SELECT * public.outbox;
+## Требования
+
+- Python 3.11+
+- PostgreSQL
+- Kafka (опционально, для интеграционных событий)
+
+## Установка
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
 ```
 
-# Очистка БД (все кроме справочников)
+## Запуск
+
+```bash
+delivery
+# или
+python -m microarch.delivery.main
 ```
+
+Сервис поднимается на порту `8082` (переменная окружения `HTTP_PORT`).
+
+## Запросы к БД
+
+```sql
+SELECT * FROM public.assignments;
+SELECT * FROM public.couriers;
+SELECT * FROM public.orders;
+SELECT * FROM public.outbox;
+```
+
+## Очистка БД (все кроме справочников)
+
+```sql
 DELETE FROM public.assignments;
 DELETE FROM public.couriers;
 DELETE FROM public.orders;
-
 DELETE FROM public.outbox;
 ```
 
-# Генерация HTTP сервера
-```
-mvn clean compile
+## Генерация gRPC-клиента из Protobuf
+
+```bash
+python -m grpc_tools.protoc \
+  -I src/main/proto \
+  --python_out=src/generated \
+  --grpc_python_out=src/generated \
+  src/main/proto/geo.proto
 ```
 
-# Генерация gRPC клиента из Protobuf
+## Генерация интеграционных событий Kafka из Protobuf
+
+```bash
+python -m grpc_tools.protoc \
+  -I src/main/proto \
+  --python_out=src/generated \
+  src/main/proto/basket_events.proto \
+  src/main/proto/order_events.proto
 ```
-mvn clean compile
+
+## Структура проекта
+
 ```
-# Генерация интеграционных событий Kafka из Protobuf
-```
-mvn clean compile
+src/
+  libs/ddd/          # базовые DDD-примитивы (Aggregate, ValueObject, DomainEvent)
+  libs/errs/         # Result, Guard, Error
+  microarch/delivery/ # точка входа FastAPI, конфигурация, publishers
+src/main/proto/      # Protobuf-контракты
+config/application.yml # справочник переменных окружения
 ```
 
 ## Лицензия
