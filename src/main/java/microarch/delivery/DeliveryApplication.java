@@ -4,11 +4,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableKafka
 @EnableScheduling
 @EnableJpaRepositories(basePackages = "microarch.delivery.adapters.out.postgres")
 @EntityScan(basePackages = { "microarch.delivery.core.domain.model",
+        "microarch.delivery.adapters.out.postgres",
         "microarch.delivery.adapters.out.postgres.outbox" })
 @SpringBootApplication
 public class DeliveryApplication {
