@@ -48,15 +48,10 @@ public class Assignment extends BaseEntity<UUID> {
      * <p>
      * Назначение создаётся в статусе {@link AssignmentStatus#ASSIGNED}.
      *
-     * @param id
-     *            уникальный идентификатор назначения; обязателен
-     * @param orderId
-     *            уникальный идентификатор заказа; обязателен
-     * @param volume
-     *            объём заказа; обязателен
-     * @param location
-     *            местоположение заказа; обязательно
-     *
+     * @param id       уникальный идентификатор назначения; обязателен
+     * @param orderId  уникальный идентификатор заказа; обязателен
+     * @param volume   объём заказа; обязателен
+     * @param location местоположение заказа; обязательно
      * @return {@code Result.success} с Assignment, либо {@code Result.failure} если параметр невалиден
      */
     public static Result<Assignment, Error> create(UUID id, UUID orderId, Volume volume, Location location) {
@@ -77,14 +72,10 @@ public class Assignment extends BaseEntity<UUID> {
      * Завершение возможно только если манхэттенское расстояние от курьера до местоположения заказа не превышает 1 (одна
      * клетка или та же клетка).
      *
-     * @param courierLocation
-     *            текущее местоположение курьера; не должно быть {@code null}
-     *
+     * @param courierLocation текущее местоположение курьера; не должно быть {@code null}
      * @return {@code UnitResult.success} если назначение успешно завершено, {@code UnitResult.failure} если курьер
-     *         слишком далеко или назначение уже завершено
-     *
-     * @throws NullPointerException
-     *             если {@code courierLocation} равен {@code null}
+     * слишком далеко или назначение уже завершено
+     * @throws NullPointerException если {@code courierLocation} равен {@code null}
      */
     public UnitResult<Error> complete(Location courierLocation) {
         Objects.requireNonNull(courierLocation, "courierLocation must not be null");

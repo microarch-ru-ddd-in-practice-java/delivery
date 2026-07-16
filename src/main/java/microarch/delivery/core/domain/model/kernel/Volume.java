@@ -1,10 +1,11 @@
 package microarch.delivery.core.domain.model.kernel;
 
-import java.util.List;
 import libs.ddd.ValueObject;
 import libs.errs.Error;
 import libs.errs.Guard;
 import libs.errs.Result;
+
+import java.util.List;
 
 /**
  * Value Object, представляющий объём заказа.
@@ -26,9 +27,7 @@ public final class Volume extends ValueObject<Volume> {
     /**
      * Создаёт объект Volume с валидацией нижней границы.
      *
-     * @param value
-     *            объём заказа; должен быть не менее {@value MIN} (не отрицательным)
-     *
+     * @param value объём заказа; должен быть не менее {@value MIN} (не отрицательным)
      * @return {@code Result.success} с объектом Volume, либо {@code Result.failure} если value отрицательный
      */
     public static Result<Volume, Error> create(int value) {
