@@ -32,10 +32,13 @@ public final class Location extends ValueObject<Location> {
     /**
      * Создаёт объект Location с валидацией координат.
      *
-     * @param x горизонтальная координата, допустимые значения: 1–10
-     * @param y вертикальная координата, допустимые значения: 1–10
+     * @param x
+     *            горизонтальная координата, допустимые значения: 1–10
+     * @param y
+     *            вертикальная координата, допустимые значения: 1–10
+     *
      * @return {@code Result.success} с объектом Location, либо {@code Result.failure} если x или y выходят за
-     * допустимый диапазон
+     *         допустимый диапазон
      */
     public static Result<Location, Error> create(int x, int y) {
         Error error = Guard.combine(Guard.againstOutOfRange(x, MIN, MAX, "x"),
@@ -53,9 +56,13 @@ public final class Location extends ValueObject<Location> {
      * Расстояние — это суммарное количество шагов по X и Y, которое необходимо сделать курьеру, двигаясь только по
      * вертикали и горизонтали. Формула: {@code |this.x - other.x| + |this.y - other.y|}.
      *
-     * @param other целевая координата; не должна быть {@code null}
+     * @param other
+     *            целевая координата; не должна быть {@code null}
+     *
      * @return количество шагов до целевой координаты
-     * @throws NullPointerException если {@code other} равен {@code null}
+     *
+     * @throws NullPointerException
+     *             если {@code other} равен {@code null}
      */
     public int distanceTo(Location other) {
         Objects.requireNonNull(other, "Location must not be null");

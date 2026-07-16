@@ -1,25 +1,21 @@
 package microarch.delivery.core.domain.model.kernel;
 
+import java.util.List;
 import libs.ddd.ValueObject;
 import libs.errs.Error;
 import libs.errs.Guard;
 import libs.errs.Result;
-import lombok.Getter;
-
-import java.util.List;
 
 /**
- * Value Object, представляющий количество заказов.
+ * Value Object, представляющий объём заказа.
  *
  * <p>
- * Используется как для количества заказов в назначении, так и для максимально допустимого количества заказов у курьера.
- * Допустимый диапазон: от {@value MIN} до {@value MAX} включительно.
+ * Объём не может быть отрицательным (не менее {@value MIN}). Верхнего ограничения нет — максимально допустимый объём
+ * определяется каждым курьером индивидуально и хранится в агрегате Courier.
  */
-@Getter
 public final class Volume extends ValueObject<Volume> {
 
     public static final int MIN = 0;
-    public static final int MAX = 10;
 
     private final int value;
 
@@ -28,20 +24,28 @@ public final class Volume extends ValueObject<Volume> {
     }
 
     /**
-     * Создаёт объект Volume с валидацией диапазона [{@value MIN}, {@value MAX}].
+     * Создаёт объект Volume с валидацией нижней границы.
      *
      * @param value
-     *            количество заказов; допустимые значения: {@value MIN}–{@value MAX}
+     *            объём заказа; должен быть не менее {@value MIN} (не отрицательным)
      *
-     * @return {@code Result.success} с объектом Volume, либо {@code Result.failure} если value выходит за допустимый
-     *         диапазон
+     * @return {@code Result.success} с объектом Volume, либо {@code Result.failure} если value отрицательный
      */
     public static Result<Volume, Error> create(int value) {
-        Error error = Guard.againstOutOfRange(value, MIN, MAX, "volume");
+        Error error = Guard.againstLessThan(value, MIN, "volume");
         if (error != null) {
             return Result.failure(error);
         }
         return Result.success(new Volume(value));
+    }
+
+    /**
+     * Возвращает числовое значение объёма.
+     *
+     * @return значение объёма
+     */
+    public int getValue() {
+        return value;
     }
 
     @Override
