@@ -7,6 +7,7 @@ import libs.errs.Error;
 import libs.errs.Guard;
 import libs.errs.Result;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -24,7 +25,9 @@ import java.util.Objects;
 @NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
 public final class Location extends ValueObject<Location> {
 
+    @Getter(AccessLevel.PUBLIC)
     private static final int MIN = 1;
+    @Getter(AccessLevel.PUBLIC)
     private static final int MAX = 10;
 
     @Column(name = "x")
