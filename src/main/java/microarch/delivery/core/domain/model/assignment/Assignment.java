@@ -55,7 +55,9 @@ public class Assignment extends BaseEntity<UUID> {
      * @return {@code Result.success} с Assignment, либо {@code Result.failure} если параметр невалиден
      */
     public static Result<Assignment, Error> create(UUID id, UUID orderId, Volume volume, Location location) {
-        Error error = Guard.combine(Guard.againstNullOrEmpty(id, "id"), Guard.againstNullOrEmpty(orderId, "orderId"),
+        Error error = Guard.combine(
+                Guard.againstNullOrEmpty(id, "id"),
+                Guard.againstNullOrEmpty(orderId, "orderId"),
                 volume == null ? GeneralErrors.valueIsRequired("volume") : null,
                 location == null ? GeneralErrors.valueIsRequired("location") : null);
 
@@ -80,13 +82,23 @@ public class Assignment extends BaseEntity<UUID> {
     public UnitResult<Error> complete(Location courierLocation) {
         Objects.requireNonNull(courierLocation, "courierLocation must not be null");
         if (AssignmentStatus.COMPLETED == status) {
-            return UnitResult.failure(Error.of("assignment.already.completed", "Assignment is already completed"));
+            return UnitResult.failure(Errors.alreadyCompleted());
         }
         if (COMPLETION_DISTANCE < courierLocation.distanceTo(location)) {
-            return UnitResult.failure(Error.of("assignment.courier.too.far",
-                    "Courier is too far from the assignment location to complete it"));
+            return UnitResult.failure(Errors.courierTooFar());
         }
         status = AssignmentStatus.COMPLETED;
         return UnitResult.success();
+    }
+
+    public static class Errors {
+        public static Error alreadyCompleted() {
+            return Error.of("assignment.already.completed", "Assignment is already completed");
+        }
+
+        public static Error courierTooFar() {
+            return Error.of("assignment.courier.too.far",
+                    "Courier is too far from the assignment location to complete it");
+        }
     }
 }
