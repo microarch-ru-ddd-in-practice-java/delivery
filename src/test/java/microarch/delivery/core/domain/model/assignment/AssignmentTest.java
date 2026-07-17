@@ -5,27 +5,27 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.UUID;
 import microarch.delivery.core.domain.model.kernel.Location;
-import microarch.delivery.core.domain.model.kernel.Volume;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+
+import static microarch.delivery.testfixtures.TestLocations.L_5_5;
+import static microarch.delivery.testfixtures.TestVolumes.VOLUME_3;
 
 class AssignmentTest {
 
     private static final UUID ID = UUID.randomUUID();
     private static final UUID ORDER_ID = UUID.randomUUID();
-    private static final Volume VOLUME = Volume.create(3).getValue();
-    private static final Location LOCATION = Location.create(5, 5).getValue();
 
     private static Assignment validAssignment() {
-        return Assignment.create(ID, ORDER_ID, VOLUME, LOCATION).getValue();
+        return Assignment.create(ID, ORDER_ID, VOLUME_3, L_5_5).getValue();
     }
 
     // --- creation: valid ---
 
     @Test
     void create_withValidParams_succeeds() {
-        assertThat(Assignment.create(ID, ORDER_ID, VOLUME, LOCATION).isSuccess()).isTrue();
+        assertThat(Assignment.create(ID, ORDER_ID, VOLUME_3, L_5_5).isSuccess()).isTrue();
     }
 
     @Test
@@ -38,22 +38,22 @@ class AssignmentTest {
 
     @Test
     void create_withNullId_fails() {
-        assertThat(Assignment.create(null, ORDER_ID, VOLUME, LOCATION).isFailure()).isTrue();
+        assertThat(Assignment.create(null, ORDER_ID, VOLUME_3, L_5_5).isFailure()).isTrue();
     }
 
     @Test
     void create_withNullOrderId_fails() {
-        assertThat(Assignment.create(ID, null, VOLUME, LOCATION).isFailure()).isTrue();
+        assertThat(Assignment.create(ID, null, VOLUME_3, L_5_5).isFailure()).isTrue();
     }
 
     @Test
     void create_withNullVolume_fails() {
-        assertThat(Assignment.create(ID, ORDER_ID, null, LOCATION).isFailure()).isTrue();
+        assertThat(Assignment.create(ID, ORDER_ID, null, L_5_5).isFailure()).isTrue();
     }
 
     @Test
     void create_withNullLocation_fails() {
-        assertThat(Assignment.create(ID, ORDER_ID, VOLUME, null).isFailure()).isTrue();
+        assertThat(Assignment.create(ID, ORDER_ID, VOLUME_3, null).isFailure()).isTrue();
     }
 
     // --- complete: success ---
@@ -74,7 +74,7 @@ class AssignmentTest {
     @Test
     void complete_changesStatusToCompleted() {
         var assignment = validAssignment();
-        assignment.complete(LOCATION);
+        assignment.complete(L_5_5);
         assertThat(assignment.getStatus()).isEqualTo(AssignmentStatus.COMPLETED);
     }
 
@@ -95,8 +95,8 @@ class AssignmentTest {
     @Test
     void complete_whenAlreadyCompleted_fails() {
         var assignment = validAssignment();
-        assignment.complete(LOCATION);
-        assertThat(assignment.complete(LOCATION).isFailure()).isTrue();
+        assignment.complete(L_5_5);
+        assertThat(assignment.complete(L_5_5).isFailure()).isTrue();
     }
 
     @Test
@@ -109,15 +109,15 @@ class AssignmentTest {
 
     @Test
     void equals_sameId_isTrue() {
-        var a = Assignment.create(ID, ORDER_ID, VOLUME, LOCATION).getValue();
-        var b = Assignment.create(ID, UUID.randomUUID(), VOLUME, LOCATION).getValue();
+        var a = Assignment.create(ID, ORDER_ID, VOLUME_3, L_5_5).getValue();
+        var b = Assignment.create(ID, UUID.randomUUID(), VOLUME_3, L_5_5).getValue();
         assertThat(a).isEqualTo(b);
     }
 
     @Test
     void equals_differentId_isFalse() {
-        var a = Assignment.create(UUID.randomUUID(), ORDER_ID, VOLUME, LOCATION).getValue();
-        var b = Assignment.create(UUID.randomUUID(), ORDER_ID, VOLUME, LOCATION).getValue();
+        var a = Assignment.create(UUID.randomUUID(), ORDER_ID, VOLUME_3, L_5_5).getValue();
+        var b = Assignment.create(UUID.randomUUID(), ORDER_ID, VOLUME_3, L_5_5).getValue();
         assertThat(a).isNotEqualTo(b);
     }
 }
