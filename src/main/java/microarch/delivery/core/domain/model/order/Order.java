@@ -1,12 +1,20 @@
 package microarch.delivery.core.domain.model.order;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import libs.ddd.Aggregate;
 import libs.errs.Error;
 import libs.errs.GeneralErrors;
 import libs.errs.Guard;
 import libs.errs.Result;
 import libs.errs.UnitResult;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import microarch.delivery.core.domain.model.kernel.Location;
 import microarch.delivery.core.domain.model.kernel.Volume;
 
@@ -20,11 +28,20 @@ import java.util.UUID;
  * {@link OrderStatus#CREATED} → {@link OrderStatus#ASSIGNED} → {@link OrderStatus#COMPLETED}. Переход в следующий
  * статус возможен только из предыдущего.
  */
+@Entity
+@Table(name = "orders")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Order extends Aggregate<UUID> {
 
-    private final Location location;
-    private final Volume volume;
+    @Embedded
+    private Location location;
+
+    @Embedded
+    private Volume volume;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
     private OrderStatus status;
 
     private Order(UUID id, Location location, Volume volume) {
@@ -47,8 +64,7 @@ public class Order extends Aggregate<UUID> {
      * @return {@code Result.success} с заказом, либо {@code Result.failure} если параметр невалиден
      */
     public static Result<Order, Error> create(UUID id, Location location, Volume volume) {
-        Error error = Guard.combine(
-                Guard.againstNullOrEmpty(id, "id"),
+        Error error = Guard.combine(Guard.againstNullOrEmpty(id, "id"),
                 location == null ? GeneralErrors.valueIsRequired("location") : null,
                 volume == null ? GeneralErrors.valueIsRequired("volume") : null);
         if (error != null) {

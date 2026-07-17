@@ -1,9 +1,13 @@
 package microarch.delivery.core.domain.model.kernel;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import libs.ddd.ValueObject;
 import libs.errs.Error;
 import libs.errs.Guard;
 import libs.errs.Result;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Objects;
@@ -16,12 +20,17 @@ import java.util.Objects;
  * включительно. Объект неизменяем: после создания его состояние не может быть изменено. Два объекта Location равны,
  * если равны их X и Y.
  */
+@Embeddable
+@NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
 public final class Location extends ValueObject<Location> {
 
     private static final int MIN = 1;
     private static final int MAX = 10;
 
+    @Column(name = "x")
     private final int x;
+
+    @Column(name = "y")
     private final int y;
 
     private Location(int x, int y) {

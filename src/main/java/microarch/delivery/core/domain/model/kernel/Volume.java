@@ -1,9 +1,13 @@
 package microarch.delivery.core.domain.model.kernel;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import libs.ddd.ValueObject;
 import libs.errs.Error;
 import libs.errs.Guard;
 import libs.errs.Result;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -14,10 +18,13 @@ import java.util.List;
  * Объём не может быть отрицательным (не менее {@value MIN}). Верхнего ограничения нет — максимально допустимый объём
  * определяется каждым курьером индивидуально и хранится в агрегате Courier.
  */
+@Embeddable
+@NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
 public final class Volume extends ValueObject<Volume> {
 
     public static final int MIN = 0;
 
+    @Column(name = "volume")
     private final int value;
 
     private Volume(int value) {
