@@ -10,30 +10,34 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import static microarch.delivery.testfixtures.TestLocations.L_1_1;
+import static microarch.delivery.testfixtures.TestLocations.L_5_5;
+import static microarch.delivery.testfixtures.TestLocations.L_6_5;
+import static microarch.delivery.testfixtures.TestVolumes.VOLUME_5;
+import static microarch.delivery.testfixtures.TestVolumes.VOLUME_20;
+import static microarch.delivery.testfixtures.TestVolumes.VOLUME_21;
+
 class CourierTest {
 
-    private static final Location LOCATION = Location.create(5, 5).getValue();
-    private static final Volume VOLUME_5 = Volume.create(5).getValue();
-
     private static Courier validCourier() {
-        return Courier.create("Ivan", LOCATION).getValue();
+        return Courier.create("Ivan", L_5_5).getValue();
     }
 
     // --- creation ---
 
     @Test
     void create_withValidParams_succeeds() {
-        assertThat(Courier.create("Ivan", LOCATION).isSuccess()).isTrue();
+        assertThat(Courier.create("Ivan", L_5_5).isSuccess()).isTrue();
     }
 
     @Test
     void create_withNullName_fails() {
-        assertThat(Courier.create(null, LOCATION).isFailure()).isTrue();
+        assertThat(Courier.create(null, L_5_5).isFailure()).isTrue();
     }
 
     @Test
     void create_withEmptyName_fails() {
-        assertThat(Courier.create("", LOCATION).isFailure()).isTrue();
+        assertThat(Courier.create("", L_5_5).isFailure()).isTrue();
     }
 
     @Test
@@ -45,25 +49,25 @@ class CourierTest {
 
     @Test
     void canTakeOrder_whenEmpty_andVolumeWithinMax_returnsTrue() {
-        assertThat(validCourier().canTakeOrder(Volume.create(20).getValue())).isTrue();
+        assertThat(validCourier().canTakeOrder(VOLUME_20)).isTrue();
     }
 
     @Test
     void canTakeOrder_whenEmpty_andVolumeExceedsMax_returnsFalse() {
-        assertThat(validCourier().canTakeOrder(Volume.create(21).getValue())).isFalse();
+        assertThat(validCourier().canTakeOrder(VOLUME_21)).isFalse();
     }
 
     @Test
     void canTakeOrder_afterPartialLoad_returnsTrueIfFits() {
         var courier = validCourier();
-        courier.addAssignment(UUID.randomUUID(), VOLUME_5, LOCATION);
+        courier.addAssignment(UUID.randomUUID(), VOLUME_5, L_5_5);
         assertThat(courier.canTakeOrder(Volume.create(15).getValue())).isTrue();
     }
 
     @Test
     void canTakeOrder_afterPartialLoad_returnsFalseIfExceeds() {
         var courier = validCourier();
-        courier.addAssignment(UUID.randomUUID(), VOLUME_5, LOCATION);
+        courier.addAssignment(UUID.randomUUID(), VOLUME_5, L_5_5);
         assertThat(courier.canTakeOrder(Volume.create(16).getValue())).isFalse();
     }
 
@@ -77,31 +81,30 @@ class CourierTest {
     @Test
     void addAssignment_whenHasCapacity_succeeds() {
         var courier = validCourier();
-        assertThat(courier.addAssignment(UUID.randomUUID(), VOLUME_5, LOCATION).isSuccess()).isTrue();
+        assertThat(courier.addAssignment(UUID.randomUUID(), VOLUME_5, L_5_5).isSuccess()).isTrue();
     }
 
     @Test
     void addAssignment_whenHasCapacity_increasesAssignmentCount() {
         var courier = validCourier();
-        courier.addAssignment(UUID.randomUUID(), VOLUME_5, LOCATION);
+        courier.addAssignment(UUID.randomUUID(), VOLUME_5, L_5_5);
         assertThat(courier.getAssignments()).hasSize(1);
     }
 
     @Test
     void addAssignment_whenVolumeExceedsMax_fails() {
         var courier = validCourier();
-        assertThat(courier.addAssignment(UUID.randomUUID(), Volume.create(21).getValue(), LOCATION).isFailure())
-                .isTrue();
+        assertThat(courier.addAssignment(UUID.randomUUID(), VOLUME_21, L_5_5).isFailure()).isTrue();
     }
 
     @Test
     void addAssignment_withNullOrderId_fails() {
-        assertThat(validCourier().addAssignment(null, VOLUME_5, LOCATION).isFailure()).isTrue();
+        assertThat(validCourier().addAssignment(null, VOLUME_5, L_5_5).isFailure()).isTrue();
     }
 
     @Test
     void addAssignment_withNullVolume_fails() {
-        assertThat(validCourier().addAssignment(UUID.randomUUID(), null, LOCATION).isFailure()).isTrue();
+        assertThat(validCourier().addAssignment(UUID.randomUUID(), null, L_5_5).isFailure()).isTrue();
     }
 
     @Test
@@ -115,7 +118,7 @@ class CourierTest {
     void completeAssignment_whenCourierAtSameLocation_succeeds() {
         var courier = validCourier();
         var orderId = UUID.randomUUID();
-        courier.addAssignment(orderId, VOLUME_5, LOCATION);
+        courier.addAssignment(orderId, VOLUME_5, L_5_5);
         assertThat(courier.completeAssignment(orderId).isSuccess()).isTrue();
     }
 
@@ -123,15 +126,15 @@ class CourierTest {
     void completeAssignment_whenCourierAdjacent_succeeds() {
         var courier = validCourier();
         var orderId = UUID.randomUUID();
-        courier.addAssignment(orderId, VOLUME_5, Location.create(6, 5).getValue());
+        courier.addAssignment(orderId, VOLUME_5, L_6_5);
         assertThat(courier.completeAssignment(orderId).isSuccess()).isTrue();
     }
 
     @Test
     void completeAssignment_whenCourierTooFar_fails() {
-        var courier = Courier.create("Ivan", Location.create(1, 1).getValue()).getValue();
+        var courier = Courier.create("Ivan", L_1_1).getValue();
         var orderId = UUID.randomUUID();
-        courier.addAssignment(orderId, VOLUME_5, Location.create(5, 5).getValue());
+        courier.addAssignment(orderId, VOLUME_5, L_5_5);
         assertThat(courier.completeAssignment(orderId).isFailure()).isTrue();
     }
 
@@ -165,7 +168,7 @@ class CourierTest {
     @Test
     void move_updatesLocation() {
         var courier = validCourier();
-        var newLocation = Location.create(6, 5).getValue();
+        var newLocation = L_6_5;
         courier.move(newLocation);
         assertThat(courier.getLocation()).isEqualTo(newLocation);
     }

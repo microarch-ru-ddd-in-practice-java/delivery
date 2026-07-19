@@ -1,12 +1,23 @@
 package microarch.delivery.core.domain.model.courier;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import libs.ddd.Aggregate;
 import libs.errs.Error;
 import libs.errs.GeneralErrors;
 import libs.errs.Guard;
 import libs.errs.Result;
 import libs.errs.UnitResult;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import microarch.delivery.core.domain.model.assignment.Assignment;
 import microarch.delivery.core.domain.model.kernel.Location;
 import microarch.delivery.core.domain.model.kernel.Volume;
@@ -24,15 +35,27 @@ import java.util.UUID;
  * Курьер создаётся с именем и начальным местоположением. Максимальный суммарный объём заказов курьера —
  * {@value DEFAULT_MAX_VOLUME}. Курьер может брать новые заказы, перемещаться на 1 шаг за раз и завершать назначения.
  */
+@Entity
+@Table(name = "couriers")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Courier extends Aggregate<UUID> {
 
     private static final int DEFAULT_MAX_VOLUME = 20;
     private static final int MAX_STEP_DISTANCE = 1;
 
-    private final String name;
-    private final Volume maxVolume;
-    private final List<Assignment> assignments;
+    @Column(name = "name")
+    private String name;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "max_volume"))
+    private Volume maxVolume;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "courier_id")
+    private List<Assignment> assignments = new ArrayList<>();
+
+    @Embedded
     private Location location;
 
     private Courier(UUID id, String name, Location location) {
@@ -84,9 +107,7 @@ public class Courier extends Aggregate<UUID> {
      */
     public boolean canTakeOrder(Volume orderVolume) {
         Objects.requireNonNull(orderVolume, "orderVolume must not be null");
-        int currentTotal = assignments.stream()
-                .mapToInt(a -> a.getVolume().getValue())
-                .sum();
+        int currentTotal = assignments.stream().mapToInt(a -> a.getVolume().getValue()).sum();
         return currentTotal + orderVolume.getValue() <= maxVolume.getValue();
     }
 
@@ -130,9 +151,7 @@ public class Courier extends Aggregate<UUID> {
      */
     public UnitResult<Error> completeAssignment(UUID orderId) {
         Objects.requireNonNull(orderId, "orderId must not be null");
-        return assignments.stream()
-                .filter(a -> a.getOrderId().equals(orderId))
-                .findFirst()
+        return assignments.stream().filter(a -> a.getOrderId().equals(orderId)).findFirst()
                 .map(a -> a.complete(location))
                 .orElse(UnitResult.failure(GeneralErrors.notFound("Assignment", orderId)));
     }
