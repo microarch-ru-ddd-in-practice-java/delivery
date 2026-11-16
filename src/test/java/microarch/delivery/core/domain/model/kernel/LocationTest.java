@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.HashSet;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,15 +32,38 @@ class LocationTest {
         assertThat(result.getError().getCode()).isEqualTo("value.is.out.of.range");
     }
 
-    @Test
-    void shouldBeEqualWhenBothCoordinatesMatch() {
-        var location = Location.create(3, 7).getValue();
-        var other = Location.create(3, 7).getValue();
+    @ParameterizedTest
+    @MethodSource("validCoordinates")
+    void shouldUseBothCoordinatesAsEqualityComponents(int x, int y) {
+        var location = Location.create(x, y).getValue();
+
+        assertThat(location.equalityComponents()).containsExactly(x, y);
+    }
+
+    @ParameterizedTest
+    @MethodSource("validCoordinates")
+    void shouldBeEqualWhenBothCoordinatesMatch(int x, int y) {
+        var location = Location.create(x, y).getValue();
+        var other = Location.create(x, y).getValue();
 
         assertThat(location).isNotSameAs(other);
         assertThat(location).isEqualTo(other);
         assertThat(other).isEqualTo(location);
         assertThat(location.hashCode()).isEqualTo(other.hashCode());
+    }
+
+    @Test
+    void shouldTreatEqualLocationsAsOneHashSetEntry() {
+        var location = Location.create(3, 7).getValue();
+        var equalLocation = Location.create(3, 7).getValue();
+        var differentLocation = Location.create(4, 7).getValue();
+        var locations = new HashSet<Location>();
+
+        locations.add(location);
+        locations.add(equalLocation);
+        locations.add(differentLocation);
+
+        assertThat(locations).hasSize(2).contains(location, differentLocation);
     }
 
     @ParameterizedTest
