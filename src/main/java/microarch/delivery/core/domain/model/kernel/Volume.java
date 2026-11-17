@@ -11,15 +11,14 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Volume extends ValueObject<Volume> {
+public final class Volume extends ValueObject<Volume> {
 
   private static final int MIN_VOLUME = 1;
 
   private final int value;
 
   public static Result<Volume, Error> create(int value) {
-    var error = Guard.combine(
-        Guard.againstOutOfRange(value, MIN_VOLUME, Integer.MAX_VALUE, "volume"));
+    var error = Guard.againstOutOfRange(value, MIN_VOLUME, Integer.MAX_VALUE, "volume");
     if (error != null) {
       return Result.failure(error);
     }
