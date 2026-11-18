@@ -36,6 +36,10 @@ public final class Location extends ValueObject<Location> {
         return Math.abs(x - other.x) + Math.abs(y - other.y);
     }
 
+    public boolean isWithinOneStepOf(Location other) {
+        return distanceTo(other) <= 1;
+    }
+
     @Override
     protected Iterable<Object> equalityComponents() {
         return List.of(this.x, this.y);

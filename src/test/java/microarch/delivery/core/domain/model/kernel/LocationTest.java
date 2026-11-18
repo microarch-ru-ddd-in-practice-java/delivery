@@ -108,6 +108,24 @@ class LocationTest {
         assertThatNullPointerException().isThrownBy(() -> location.distanceTo(null));
     }
 
+    @ParameterizedTest
+    @MethodSource("proximityCases")
+    void shouldRecognizeLocationsWithinOneStep(int fromX, int fromY, int toX, int toY,
+            boolean expected) {
+        var from = Location.create(fromX, fromY).getValue();
+        var to = Location.create(toX, toY).getValue();
+
+        assertThat(from.isWithinOneStepOf(to)).isEqualTo(expected);
+        assertThat(to.isWithinOneStepOf(from)).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldRejectNullProximityTarget() {
+        var location = Location.create(1, 1).getValue();
+
+        assertThatNullPointerException().isThrownBy(() -> location.isWithinOneStepOf(null));
+    }
+
     private static Stream<Arguments> validCoordinates() {
         return Stream.of(
                 Arguments.of(3, 7),
@@ -115,10 +133,11 @@ class LocationTest {
                 Arguments.of(10, 10));
     }
 
-    private static Stream<Arguments> oppositeBoardCorners() {
+    private static Stream<Arguments> proximityCases() {
         return Stream.of(
-                Arguments.of(1, 10),
-                Arguments.of(10, 1));
+                Arguments.of(5, 5, 5, 5, true),
+                Arguments.of(5, 5, 4, 5, true),
+                Arguments.of(5, 5, 4, 4, false));
     }
 
     private static Stream<Arguments> coordinatesOutsideBoard() {
