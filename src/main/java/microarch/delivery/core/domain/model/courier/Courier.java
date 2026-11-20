@@ -50,11 +50,15 @@ public final class Courier extends Aggregate<UUID> {
     if (Guard.againstNullOrEmpty(order, "order") != null) {
       return false;
     }
-    var assignedVolume = assignments.stream()
+    var orderVolume = order.getVolume();
+    if (orderVolume.isGreaterThan(maxVolume)) {
+      return false;
+    }
+    var totalVolume = assignments.stream()
         .filter(assignment -> assignment.getStatus() == Status.ASSIGNED)
-        .mapToLong(assignment -> assignment.getVolume().getValue())
-        .sum();
-    return assignedVolume + order.getVolume().getValue() <= maxVolume.getValue();
+        .map(Assignment::getVolume)
+        .reduce(orderVolume, Volume::add);
+    return !totalVolume.isGreaterThan(maxVolume);
   }
 
   public UnitResult<Error> takeOrder(Order order) {

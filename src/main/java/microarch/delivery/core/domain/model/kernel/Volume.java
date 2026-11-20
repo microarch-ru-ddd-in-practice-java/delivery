@@ -1,6 +1,7 @@
 package microarch.delivery.core.domain.model.kernel;
 
 import java.util.List;
+import java.util.Objects;
 import libs.ddd.ValueObject;
 import libs.errs.Error;
 import libs.errs.Guard;
@@ -23,6 +24,16 @@ public final class Volume extends ValueObject<Volume> {
       return Result.failure(error);
     }
     return Result.success(new Volume(value));
+  }
+
+  public Volume add(Volume other) {
+    Objects.requireNonNull(other, "other volume is null");
+    return new Volume(Math.addExact(value, other.value));
+  }
+
+  public boolean isGreaterThan(Volume other) {
+    Objects.requireNonNull(other, "other volume is null");
+    return value > other.value;
   }
 
   @Override
