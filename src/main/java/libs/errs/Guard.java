@@ -41,6 +41,13 @@ public final class Guard {
         return null;
     }
 
+    public static Error againstNullOrEmpty(Object value, String paramName) {
+        if (value == null) {
+            return GeneralErrors.valueIsRequired(paramName);
+        }
+        return null;
+    }
+
     public static <T extends Comparable<T>> Error againstGreaterThan(T value, T max, String paramName) {
 
         if (value == null || value.compareTo(max) > 0) {
