@@ -1,5 +1,14 @@
 package microarch.delivery.core.domain.model.courier;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -17,15 +26,23 @@ import microarch.delivery.core.domain.model.kernel.Volume;
 import microarch.delivery.core.domain.model.order.Order;
 
 @NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
+@Entity
+@Table(name = "couriers")
 public final class Courier extends Aggregate<UUID> {
   private static final int MAX_VOLUME = 20;
 
   @Getter
+  @Column(nullable = false)
   private String name;
   @Getter
+  @Embedded
   private Location location;
   @Getter
+  @Embedded
+  @AttributeOverride(name = "value", column = @Column(name = "max_volume", nullable = false))
   private Volume maxVolume;
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+  @JoinColumn(name = "courier_id", nullable = false)
   private List<Assignment> assignments;
 
   private Courier(String name, Location location) {

@@ -1,5 +1,7 @@
 package microarch.delivery.core.domain.model.kernel;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import java.util.List;
 import java.util.Objects;
 import libs.ddd.ValueObject;
@@ -9,13 +11,17 @@ import libs.errs.Result;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Embeddable
+@NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Volume extends ValueObject<Volume> {
 
   private static final int MIN_VOLUME = 1;
 
+  @Column(name = "volume", nullable = false)
   private final int value;
 
   public static Result<Volume, Error> create(int value) {
